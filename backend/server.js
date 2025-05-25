@@ -9,7 +9,12 @@ const taskRoutes = require('./routes/tasks');
 const userRoutes = require('./routes/users');
 
 const app = express();
-app.use(cors());
+// Configure CORS to allow requests from frontend domain
+app.use(cors({
+  origin: ['https://task-manager-frontend-seven-chi.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Connect to MongoDB
