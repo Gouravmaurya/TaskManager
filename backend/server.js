@@ -11,7 +11,7 @@ const userRoutes = require('./routes/users');
 const app = express();
 // Configure CORS to allow requests from frontend domain
 app.use(cors({
-  origin: ['https://task-manager-frontend-seven-chi.vercel.app', 'http://localhost:3000'],
+  origin: ['https://task-manager-frontend-seven-chi.vercel.app', 'https://task-manager-lovat-six.vercel.app', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
