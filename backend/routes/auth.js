@@ -29,14 +29,25 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Incorrect password' });
+    if (!isMatch) return res.status(400).json({ message: 'Invalid password' });
 
-    const token = generateToken(user._id);
-
-    res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    try {
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({ message: 'Token generation failed: Server configuration error' });
+      }
+      
+      const token = generateToken(user._id);
+      if (!token) {
+        return res.status(500).json({ message: 'Error generating authentication token' });
+      }
+      
+      res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    } catch (tokenErr) {
+      return res.status(500).json({ message: 'Invalid token generation' });
+    }
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

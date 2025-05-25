@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
       const user = await User.findOne({ email });
       if (!user) {
         console.log('User not found with email:', email);
-        return res.status(400).json({ message: 'Invalid email or password' });
+        return res.status(404).json({ message: 'User not found' });
       }
       console.log('User found:', { id: user._id, username: user.username });
   
@@ -61,13 +61,22 @@ router.post('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         console.log('Password mismatch for user:', user._id);
-        return res.status(400).json({ message: 'Invalid email or password' });
+        return res.status(400).json({ message: 'Invalid password' });
       }
       console.log('Password matched successfully');
   
       // Generate token
       try {
+        if (!process.env.JWT_SECRET) {
+          console.error('JWT_SECRET is not defined');
+          return res.status(500).json({ message: 'Token generation failed: Server configuration error' });
+        }
+        
         const token = generateToken(user._id);
+        if (!token) {
+          console.error('Token generation failed');
+          return res.status(500).json({ message: 'Error generating authentication token' });
+        }
         console.log('Token generated successfully');
         
         // Send response with token and user info
@@ -82,7 +91,7 @@ router.post('/login', async (req, res) => {
         });
       } catch (tokenErr) {
         console.error('Token generation error:', tokenErr);
-        return res.status(500).json({ message: 'Error generating authentication token' });
+        return res.status(500).json({ message: 'Invalid token generation' });
       }
     } catch (err) {
       console.error('Login route error:', err);
