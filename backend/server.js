@@ -11,14 +11,23 @@ const userRoutes = require('./routes/users');
 const app = express();
 // Configure CORS to allow requests from frontend domain
 // Enhanced CORS configuration
-app.use(cors({
-  origin: ['https://task-manager-frontend-seven-chi.vercel.app', 'https://task-manager-lovat-six.vercel.app', 'http://localhost:3000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-}));
+// Set up CORS middleware with more permissive configuration
+app.use(cors());
+
+// Add custom CORS headers to all responses
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+  
+  next();
+});
 app.use(express.json());
 
 // Connect to MongoDB
