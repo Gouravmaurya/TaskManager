@@ -1,13 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { generateToken } = require('../utils/jwt');
 const User = require('../models/User'); // Adjust the path as needed
-
-// Helper function to generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '1d' });
-};
 // @route   POST /api/users/register
 // @desc    Register a new user
 // @access  Public
