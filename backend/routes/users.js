@@ -41,30 +41,52 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
+      console.log('Login attempt with:', { email: req.body.email });
+      
       const { email, password } = req.body;
   
       if (!email || !password) {
+        console.log('Missing email or password');
         return res.status(400).json({ message: 'Please provide email and password' });
       }
   
       const user = await User.findOne({ email });
       if (!user) {
+        console.log('User not found with email:', email);
         return res.status(400).json({ message: 'Invalid email or password' });
       }
+      console.log('User found:', { id: user._id, username: user.username });
   
       // Compare password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
+        console.log('Password mismatch for user:', user._id);
         return res.status(400).json({ message: 'Invalid email or password' });
       }
+      console.log('Password matched successfully');
   
       // Generate token
-      const token = generateToken(user._id);
-  
-      res.json({ message: 'Login successful', token, user: { _id: user._id, username: user.username, email: user.email } });
+      try {
+        const token = generateToken(user._id);
+        console.log('Token generated successfully');
+        
+        // Send response with token and user info
+        return res.json({ 
+          message: 'Login successful', 
+          token, 
+          user: { 
+            _id: user._id, 
+            username: user.username, 
+            email: user.email 
+          } 
+        });
+      } catch (tokenErr) {
+        console.error('Token generation error:', tokenErr);
+        return res.status(500).json({ message: 'Error generating authentication token' });
+      }
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: 'Server error' });
+      console.error('Login route error:', err);
+      return res.status(500).json({ message: 'Server error', error: err.message });
     }
   });
 

@@ -3,6 +3,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+// Import environment check utility
+const { checkEnv } = require('./utils/env-check');
+
 // Routes
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
@@ -37,6 +40,21 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 
+// Add diagnostic route for environment variables
+app.get('/api/system/env-check', (req, res) => {
+  const envStatus = checkEnv();
+  res.json({
+    status: envStatus.allPresent ? 'OK' : 'Missing Variables',
+    details: envStatus
+  });
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  
+  // Log environment status on startup
+  const envStatus = checkEnv();
+  console.log('Environment variables status:', envStatus);
+});
