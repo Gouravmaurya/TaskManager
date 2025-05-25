@@ -10,24 +10,19 @@ const userRoutes = require('./routes/users');
 
 const app = express();
 // Configure CORS to allow requests from frontend domain
-// Enhanced CORS configuration
-// Set up CORS middleware with more permissive configuration
-app.use(cors());
+// Import custom CORS middleware
+const corsMiddleware = require('./middlewares/cors');
 
-// Add custom CORS headers to all responses
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-  
-  next();
-});
+// Apply CORS middleware first (before any route handlers)
+app.use(corsMiddleware);
+
+// Also use the cors package for additional protection
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Connect to MongoDB
