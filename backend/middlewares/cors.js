@@ -1,9 +1,7 @@
 // CORS middleware for handling cross-origin requests
 module.exports = (req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
+  // Allow requests from any origin
+  res.setHeader('Access-Control-Allow-Origin', '*');
   
   // Allow specific methods
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
