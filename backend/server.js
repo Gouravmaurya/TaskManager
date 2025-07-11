@@ -12,18 +12,9 @@ const taskRoutes = require('./routes/tasks');
 const userRoutes = require('./routes/users');
 
 const app = express();
-// Configure CORS to allow requests from any origin
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    // Reflect the request origin, as it is the safest way to handle credentials
-    callback(null, origin);
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// Import and use custom CORS middleware
+const corsMiddleware = require('./middlewares/cors');
+app.use(corsMiddleware);
 app.use(express.json());
 
 // Connect to MongoDB
